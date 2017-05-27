@@ -6,13 +6,11 @@
     android:layout_height="match_parent"
     tools:context="jasonngor.com.redditsavesearch.LandingActivity">
 
-    <TextView
-        android:id="@+id/textView"
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="123dp"
-        android:layout_marginTop="159dp"
-        android:text="LANDING ACTIVITY" />
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
 </RelativeLayout>

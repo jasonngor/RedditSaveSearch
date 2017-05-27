@@ -24,7 +24,8 @@
             android:name="net.dean.jraw.REDDIT_USERNAME"
             android:value="redditSaveSearch" />
 
-        <activity android:name=".LoginActivity"></activity>
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".MainActivity"></activity>
     </application>
 
 </manifest>

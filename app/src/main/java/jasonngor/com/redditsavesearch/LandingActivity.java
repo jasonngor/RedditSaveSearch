@@ -7,9 +7,11 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -45,6 +47,7 @@ public class LandingActivity extends AppCompatActivity {
     private WebView webView;
     private Context context;
     private RequestQueue requestQueue;
+    private ProgressBar spinner;
 
     private final String clientId = "SgPuJGeI5QBmiw";
 
@@ -58,15 +61,21 @@ public class LandingActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        spinner = (ProgressBar) findViewById(R.id.progressBar);
         AuthenticationState authState = AuthenticationManager.get().checkAuthState();
+        Intent intent;
 
         switch (authState) {
             case READY:
+                spinner.setVisibility(View.GONE);
+                intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
                 break;
 
             case NONE:
                 Toast.makeText(LandingActivity.this, "Log in first", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(this, LoginActivity.class);
+                intent = new Intent(this, LoginActivity.class);
                 startActivity(intent);
                 break;
 
@@ -82,6 +91,8 @@ public class LandingActivity extends AppCompatActivity {
             protected Void doInBackground(Credentials... params) {
                 try {
                     AuthenticationManager.get().refreshAccessToken(LoginActivity.CREDENTIALS);
+                    Intent intent = new Intent(LandingActivity.this, MainActivity.class);
+                    startActivity(intent);
                 } catch (NoSuchTokenException | OAuthException e){
                     Log.e("refreshAccessTokenAsync", "Failed to refresh access token", e);
                 }
@@ -91,6 +102,7 @@ public class LandingActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(Void v) {
                 Log.d("refreshAccessTokenAsync", "Reauthenticated");
+                spinner.setVisibility(View.GONE);
             }
         }.execute();
     }
