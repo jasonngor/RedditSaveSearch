@@ -1,14 +1,14 @@
-package jasonngor.com.redditsavesearch;
+package jasonngor.com.redditsavesearch.activities;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -23,30 +23,42 @@ import net.dean.jraw.paginators.UserContributionPaginator;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+import jasonngor.com.redditsavesearch.R;
+
+public class MainActivity extends BaseActivity {
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private ProgressBar spinner;
+    private UserContributionPaginator paginator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        super.onCreate(savedInstanceState);
 
         spinner = (ProgressBar) findViewById(R.id.progressBar2);
         spinner.setVisibility(View.VISIBLE);
 
         RedditClient reddit = AuthenticationManager.get().getRedditClient();
         String loggedUser = reddit.getAuthenticatedUser();
-        final UserContributionPaginator paginator = new UserContributionPaginator(reddit, "saved", loggedUser);
+        paginator = new UserContributionPaginator(reddit, "saved", loggedUser);
         paginator.setLimit(1000);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
+        getAllSavedAsyncTask();
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    public void getAllSavedAsyncTask() {
         new AsyncTask<UserContributionPaginator, Void, ArrayList<Contribution>>() {
             private ArrayList<Contribution> savedList;
             @Override
@@ -69,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }.execute(paginator);
     }
-
     private class MyAdapter extends RecyclerView.Adapter<MyAdapter.ContributionViewHolder> {
         private ArrayList<Contribution> savedList;
 

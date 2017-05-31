@@ -1,8 +1,7 @@
-package jasonngor.com.redditsavesearch;
+package jasonngor.com.redditsavesearch.activities;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebView;
@@ -18,14 +17,16 @@ import net.dean.jraw.http.oauth.OAuthHelper;
 
 import java.net.URL;
 
-public class LoginActivity extends AppCompatActivity {
+import jasonngor.com.redditsavesearch.R;
+
+public class LoginActivity extends BaseActivity {
 
     public static final Credentials CREDENTIALS = Credentials.installedApp("SgPuJGeI5QBmiw", "https://github.com/jasonngor/RedditSaveSearch");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        super.onCreate(savedInstanceState);
 
         final OAuthHelper helper = AuthenticationManager.get().getRedditClient().getOAuthHelper();
 

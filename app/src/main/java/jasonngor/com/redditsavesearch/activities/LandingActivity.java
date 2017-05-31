@@ -1,25 +1,16 @@
-package jasonngor.com.redditsavesearch;
+package jasonngor.com.redditsavesearch.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.auth.AuthenticationManager;
@@ -27,19 +18,12 @@ import net.dean.jraw.auth.AuthenticationState;
 import net.dean.jraw.auth.NoSuchTokenException;
 import net.dean.jraw.http.UserAgent;
 import net.dean.jraw.http.oauth.Credentials;
-import net.dean.jraw.http.oauth.OAuthData;
 import net.dean.jraw.http.oauth.OAuthException;
 import net.dean.jraw.http.oauth.OAuthHelper;
-import net.dean.jraw.models.Contribution;
-import net.dean.jraw.models.Listing;
-import net.dean.jraw.models.Submission;
-import net.dean.jraw.paginators.UserContributionPaginator;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import jasonngor.com.redditsavesearch.R;
 
-public class LandingActivity extends AppCompatActivity {
+public class LandingActivity extends BaseActivity {
     private UserAgent myUserAgent;
     private RedditClient redditClient;
     private OAuthHelper oAuthHelper;
@@ -53,8 +37,8 @@ public class LandingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
+        super.onCreate(savedInstanceState);
         context = this;
     }
 

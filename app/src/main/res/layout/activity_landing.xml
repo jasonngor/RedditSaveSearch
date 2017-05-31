@@ -4,7 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="jasonngor.com.redditsavesearch.LandingActivity">
+    tools:context="jasonngor.com.redditsavesearch.activities.LandingActivity">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"/>
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -13,4 +17,5 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true" />
+
 </RelativeLayout>
