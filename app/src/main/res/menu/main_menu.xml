@@ -12,5 +12,6 @@
         android:orderInCategory="450"
         android:title="@string/search"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_search_black_24dp" />
+        android:icon="@drawable/ic_search_black_24dp"
+        app:actionViewClass="android.support.v7.widget.SearchView" />
 </menu>

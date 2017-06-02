@@ -4,11 +4,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -27,7 +30,7 @@ import jasonngor.com.redditsavesearch.R;
 
 public class MainActivity extends BaseActivity {
     private RecyclerView recyclerView;
-    private RecyclerView.Adapter adapter;
+    private MyAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private ProgressBar spinner;
     private UserContributionPaginator paginator;
@@ -49,12 +52,28 @@ public class MainActivity extends BaseActivity {
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
+
         getAllSavedAsyncTask();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        MenuItem searchItem = menu.findItem(R.id.search_toolbar_item);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adapter.filter(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.filter(newText);
+                return true;
+            }
+        });
         return true;
     }
 
@@ -77,12 +96,12 @@ public class MainActivity extends BaseActivity {
             protected void onPostExecute(ArrayList<Contribution> savedList) {
                 spinner.setVisibility(View.GONE);
                 recyclerView.setAdapter(adapter);
-                Log.d("setadapter", String.valueOf(true));
             }
         }.execute(paginator);
     }
     private class MyAdapter extends RecyclerView.Adapter<MyAdapter.ContributionViewHolder> {
         private ArrayList<Contribution> savedList;
+        private ArrayList<Contribution> savedListCopy;
 
         public class ContributionViewHolder extends RecyclerView.ViewHolder {
             public TextView vContributionContent;
@@ -97,6 +116,7 @@ public class MainActivity extends BaseActivity {
 
         public MyAdapter(ArrayList<Contribution> dataset) {
             this.savedList = dataset;
+            this.savedListCopy = new ArrayList<>(dataset);
         }
 
         @Override
@@ -132,6 +152,27 @@ public class MainActivity extends BaseActivity {
         @Override
         public int getItemCount() {
             return savedList.size();
+        }
+
+        public void filter(String text) {
+            savedList.clear();
+            if (text.isEmpty()) {
+                savedList.addAll(savedListCopy);
+            } else {
+                text = text.toLowerCase();
+                for (Contribution c: savedListCopy) {
+                    if (c instanceof Submission) {
+                        if (((Submission) c).getTitle().toLowerCase().contains(text)) {
+                            savedList.add(c);
+                        }
+                    } else {
+                        if (((Comment) c).getSubmissionTitle().toLowerCase().contains(text)) {
+                            savedList.add(c);
+                        }
+                    }
+                }
+            }
+            notifyDataSetChanged();
         }
     }
 }
