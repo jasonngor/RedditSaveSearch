@@ -56,27 +56,6 @@ public class MainActivity extends BaseActivity {
         getAllSavedAsyncTask();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        MenuItem searchItem = menu.findItem(R.id.search_toolbar_item);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                adapter.filter(query);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                adapter.filter(newText);
-                return true;
-            }
-        });
-        return true;
-    }
-
     public void getAllSavedAsyncTask() {
         new AsyncTask<UserContributionPaginator, Void, ArrayList<Contribution>>() {
             private ArrayList<Contribution> savedList;
@@ -99,6 +78,53 @@ public class MainActivity extends BaseActivity {
             }
         }.execute(paginator);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        MenuItem searchItem = menu.findItem(R.id.search_toolbar_item);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adapter.filter(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.filter(newText);
+                return true;
+            }
+        });
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.logout_toolbar_item:
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        AuthenticationManager.get().getRedditClient().getOAuthHelper().revokeAccessToken(LoginActivity.CREDENTIALS);
+                        AuthenticationManager.get().getRedditClient().deauthenticate();
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void v) {
+                        MainActivity.this.finish();
+                    }
+                }.execute();
+
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private class MyAdapter extends RecyclerView.Adapter<MyAdapter.ContributionViewHolder> {
         private ArrayList<Contribution> savedList;
         private ArrayList<Contribution> savedListCopy;
