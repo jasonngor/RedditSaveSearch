@@ -35,6 +35,7 @@ public class LoginActivity extends BaseActivity {
         final URL authorizationURL = helper.getAuthorizationUrl(CREDENTIALS, true, true, scopes);
         final WebView webView = ((WebView) findViewById(R.id.webview));
 
+        Log.d("AuthorizationURL", authorizationURL.toExternalForm().toString());
         webView.loadUrl(authorizationURL.toExternalForm());
         webView.setWebViewClient(new WebViewClient() {
             @Override
