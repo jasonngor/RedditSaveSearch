@@ -41,6 +41,7 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 if (url.contains("code=")) {
+                    webView.stopLoading();
                     onUserChallenge(url, CREDENTIALS);
                 } else if (url.contains("error=")) {
                     Toast.makeText(LoginActivity.this, "You must press 'allow' to log in with this account", Toast.LENGTH_SHORT).show();
