@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.webkit.CookieManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
@@ -35,7 +36,6 @@ public class LoginActivity extends BaseActivity {
         final URL authorizationURL = helper.getAuthorizationUrl(CREDENTIALS, true, true, scopes);
         final WebView webView = ((WebView) findViewById(R.id.webview));
 
-        Log.d("AuthorizationURL", authorizationURL.toExternalForm().toString());
         webView.loadUrl(authorizationURL.toExternalForm());
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -48,6 +48,12 @@ public class LoginActivity extends BaseActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        CookieManager.getInstance().removeAllCookies(null);
     }
 
     private void onUserChallenge(final String url, final Credentials creds) {
