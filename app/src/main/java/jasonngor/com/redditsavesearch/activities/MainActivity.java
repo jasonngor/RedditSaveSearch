@@ -8,6 +8,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +36,9 @@ public class MainActivity extends BaseActivity {
     private RecyclerView.LayoutManager layoutManager;
     private ProgressBar spinner;
     private UserContributionPaginator paginator;
+    private RedditClient reddit;
+    private String loggedUser;
+    private ArrayList<Contribution> savedList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +46,9 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         spinner = (ProgressBar) findViewById(R.id.progressBar2);
-        spinner.setVisibility(View.VISIBLE);
 
-        RedditClient reddit = AuthenticationManager.get().getRedditClient();
-        String loggedUser = reddit.getAuthenticatedUser();
-        paginator = new UserContributionPaginator(reddit, "saved", loggedUser);
-        paginator.setLimit(1000);
+        reddit = AuthenticationManager.get().getRedditClient();
+        loggedUser = reddit.getAuthenticatedUser();
 
         recyclerView = (FastScrollRecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
@@ -58,10 +59,23 @@ public class MainActivity extends BaseActivity {
     }
 
     public void getAllSavedAsyncTask() {
+        paginator = new UserContributionPaginator(reddit, "saved", loggedUser);
+        paginator.setLimit(1000);
+
         new AsyncTask<UserContributionPaginator, Void, ArrayList<Contribution>>() {
-            private ArrayList<Contribution> savedList;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                if (adapter != null) {
+                    adapter.clear();
+                }
+                spinner.setVisibility(View.VISIBLE);
+            }
+
             @Override
             protected ArrayList<Contribution> doInBackground(UserContributionPaginator... params) {
+
                 savedList = new ArrayList<>();
                 while (paginator.hasNext()) {
                     for (Contribution c:params[0].next()) {
@@ -81,10 +95,27 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        MenuItem searchItem = menu.findItem(R.id.search_toolbar_item);
+
+        final MenuItem searchItem = menu.findItem(R.id.search_toolbar_item);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setItemsVisibility(menu, searchItem, false);
+            }
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                setItemsVisibility(menu, searchItem, true);
+                return false;
+            }
+        });
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -99,6 +130,13 @@ public class MainActivity extends BaseActivity {
             }
         });
         return true;
+    }
+
+    private void setItemsVisibility(Menu menu, MenuItem exception, boolean visible) {
+        for (int i = 0; i < menu.size(); ++i) {
+            MenuItem item = menu.getItem(i);
+            if (item != exception) item.setVisible(visible);
+        }
     }
 
     @Override
@@ -119,6 +157,10 @@ public class MainActivity extends BaseActivity {
                     }
                 }.execute();
 
+                return true;
+
+            case R.id.refresh_toolbar_item:
+                getAllSavedAsyncTask();
                 return true;
 
             default:
@@ -199,6 +241,11 @@ public class MainActivity extends BaseActivity {
                     }
                 }
             }
+            notifyDataSetChanged();
+        }
+
+        public void clear() {
+            savedList.clear();
             notifyDataSetChanged();
         }
     }
