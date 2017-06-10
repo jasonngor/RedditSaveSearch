@@ -8,7 +8,6 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.auth.AuthenticationManager;
@@ -29,8 +30,8 @@ import java.util.ArrayList;
 import jasonngor.com.redditsavesearch.R;
 
 public class MainActivity extends BaseActivity {
-    private RecyclerView recyclerView;
-    private MyAdapter adapter;
+    private FastScrollRecyclerView recyclerView;
+    private RecyclerAdapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private ProgressBar spinner;
     private UserContributionPaginator paginator;
@@ -48,7 +49,7 @@ public class MainActivity extends BaseActivity {
         paginator = new UserContributionPaginator(reddit, "saved", loggedUser);
         paginator.setLimit(1000);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView = (FastScrollRecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -67,7 +68,7 @@ public class MainActivity extends BaseActivity {
                         savedList.add(c);
                     }
                 }
-                adapter = new MyAdapter(savedList);
+                adapter = new RecyclerAdapter(savedList);
                 return savedList;
             }
 
@@ -125,7 +126,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private class MyAdapter extends RecyclerView.Adapter<MyAdapter.ContributionViewHolder> {
+    private class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ContributionViewHolder> {
         private ArrayList<Contribution> savedList;
         private ArrayList<Contribution> savedListCopy;
 
@@ -140,7 +141,7 @@ public class MainActivity extends BaseActivity {
             }
         }
 
-        public MyAdapter(ArrayList<Contribution> dataset) {
+        public RecyclerAdapter(ArrayList<Contribution> dataset) {
             this.savedList = dataset;
             this.savedListCopy = new ArrayList<>(dataset);
         }

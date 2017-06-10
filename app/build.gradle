@@ -38,5 +38,6 @@ dependencies {
     compile 'com.android.volley:volley:1.0.0'
     compile 'com.android.support:recyclerview-v7:25.3.1'
     compile 'com.android.support:cardview-v7:25.3.1'
+    compile 'com.github.timusus:RecyclerView-FastScroll:0a5e26f92d'
     testCompile 'junit:junit:4.12'
 }
