@@ -46,7 +46,12 @@ public class MainActivity extends BaseActivity {
 
         spinner = (ProgressBar) findViewById(R.id.progressBar2);
 
-        reddit = AuthenticationManager.get().getRedditClient();
+        try {
+            reddit = AuthenticationManager.get().getRedditClient();
+        } catch (IllegalStateException e) {
+            MainActivity.this.finish();
+        }
+        
         loggedUser = reddit.getAuthenticatedUser();
 
         recyclerView = (FastScrollRecyclerView) findViewById(R.id.recyclerView);
