@@ -1,20 +1,19 @@
 package jasonngor.com.redditsavesearch.activities;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
@@ -171,19 +170,30 @@ public class MainActivity extends BaseActivity {
     private class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ContributionViewHolder> {
         private ArrayList<Contribution> savedList;
         private ArrayList<Contribution> savedListCopy;
+        private int expandedPosition = -1;
 
         public class ContributionViewHolder extends RecyclerView.ViewHolder {
-            public TextView vContributionContent;
-            public TextView vContributionNum;
+            private TextView vContributionContent;
+            private TextView vContributionNum;
+            private RelativeLayout unexpandedLayout;
+            private RelativeLayout expandedLayout;
+            private ImageButton btnComments;
+            private ImageButton btnSave;
+            private ImageButton btnLink;
 
-            public ContributionViewHolder(View v) {
+            private ContributionViewHolder(View v) {
                 super(v);
                 vContributionNum = (TextView) v.findViewById(R.id.txtContributionNum);
                 vContributionContent = (TextView) v.findViewById(R.id.txtContributionContent);
+                unexpandedLayout = (RelativeLayout) v.findViewById(R.id.unexpandedLayout);
+                expandedLayout = (RelativeLayout) v.findViewById(R.id.expandedLayout);
+                btnComments = (ImageButton) v.findViewById(R.id.btnComments);
+                btnSave = (ImageButton) v.findViewById(R.id.btnSave);
+                btnLink = (ImageButton) v.findViewById(R.id.btnLink);
             }
         }
 
-        public RecyclerAdapter(ArrayList<Contribution> dataset) {
+        private RecyclerAdapter(ArrayList<Contribution> dataset) {
             this.savedList = dataset;
             this.savedListCopy = new ArrayList<>(dataset);
         }
@@ -195,21 +205,34 @@ public class MainActivity extends BaseActivity {
         }
 
         @Override
-        public void onBindViewHolder(ContributionViewHolder holder, int position) {
+        public void onBindViewHolder(ContributionViewHolder holder, final int position) {
             final Contribution contribution = savedList.get(position);
-            holder.vContributionContent.setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View v) {
-                    Uri address;
-                    if (contribution instanceof Submission) {
-                        address = Uri.parse(((Submission) contribution).getUrl());
-                    } else {
-                        address = Uri.parse(((Comment) contribution).getUrl());
+            final boolean isExpanded = position == expandedPosition;
+            holder.expandedLayout.setVisibility(isExpanded ? View.VISIBLE:View.GONE);
+
+            holder.unexpandedLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (expandedPosition >= 0) {
+                        int prev = expandedPosition;
+                        notifyItemChanged(prev);
                     }
-                    Intent intent = new Intent(Intent.ACTION_VIEW, address);
-                    startActivity(intent);
+                    expandedPosition = isExpanded ? -1:position;
+                    notifyItemChanged(position);
                 }
             });
 
+            //open url
+//            @Override public void onClick(View v) {
+//                Uri address;
+//                if (contribution instanceof Submission) {
+//                    address = Uri.parse(((Submission) contribution).getUrl());
+//                } else {
+//                    address = Uri.parse(((Comment) contribution).getUrl());
+//                }
+//                Intent intent = new Intent(Intent.ACTION_VIEW, address);
+//                startActivity(intent);
+//            }
             holder.vContributionNum.setText(String.format("#%d", position + 1));
             if (contribution instanceof Submission){
                 holder.vContributionContent.setText(((Submission)contribution).getTitle());

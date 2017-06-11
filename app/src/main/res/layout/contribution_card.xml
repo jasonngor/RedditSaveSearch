@@ -6,8 +6,10 @@
     android:layout_margin="5dp">
 
     <RelativeLayout
+        android:id="@+id/unexpandedLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
         android:padding="5dp">
 
         <TextView
@@ -34,36 +36,37 @@
             android:layout_height="50dp"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/txtContributionContent"
-            android:layout_marginTop="10dp"
-            android:stateListAnimator="@animator/contribution_card_selection"
-            >
+            android:layout_marginTop="10dp">
 
-            <Button
-                android:id="@+id/btnComment"
+            <ImageButton
+                android:id="@+id/btnComments"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginStart="18dp"
-                android:text="Button" />
+                android:layout_centerVertical="true"
+                android:layout_marginStart="25dp"
+                android:background="@null"
+                android:src="@drawable/ic_message_black_24dp" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/btnSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/expandedLayout"
+                android:layout_alignTop="@+id/btnComments"
                 android:layout_centerHorizontal="true"
-                android:text="Button" />
+                android:background="@null"
+                android:src="@drawable/ic_star_black_24dp" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/btnLink"
-                style="@style/Widget.AppCompat.Button.Small"
+                style="@style/Widget.AppCompat.ImageButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_alignTop="@+id/expandedLayout"
-                android:layout_marginEnd="19dp"
-                android:text="Button" />
+                android:layout_alignTop="@+id/btnSave"
+                android:layout_marginEnd="17dp"
+                android:background="@null"
+                android:src="@drawable/ic_link_black_24dp" />
 
         </RelativeLayout>
 
