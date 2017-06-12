@@ -1,11 +1,14 @@
 package jasonngor.com.redditsavesearch.activities;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,11 +18,15 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
+import net.dean.jraw.ApiException;
 import net.dean.jraw.RedditClient;
 import net.dean.jraw.auth.AuthenticationManager;
+import net.dean.jraw.http.NetworkException;
+import net.dean.jraw.managers.AccountManager;
 import net.dean.jraw.models.Comment;
 import net.dean.jraw.models.Contribution;
 import net.dean.jraw.models.Submission;
@@ -38,6 +45,7 @@ public class MainActivity extends BaseActivity {
     private RedditClient reddit;
     private String loggedUser;
     private ArrayList<Contribution> savedList;
+    private AccountManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +56,12 @@ public class MainActivity extends BaseActivity {
 
         try {
             reddit = AuthenticationManager.get().getRedditClient();
+            loggedUser = reddit.getAuthenticatedUser();
+            manager = new AccountManager(reddit);
         } catch (IllegalStateException e) {
             MainActivity.this.finish();
         }
-        
-        loggedUser = reddit.getAuthenticatedUser();
+
 
         recyclerView = (FastScrollRecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
@@ -182,9 +191,9 @@ public class MainActivity extends BaseActivity {
             private TextView vContributionNum;
             private RelativeLayout unexpandedLayout;
             private RelativeLayout expandedLayout;
+            private ImageButton btnLink;
             private ImageButton btnComments;
             private ImageButton btnSave;
-            private ImageButton btnLink;
 
             private ContributionViewHolder(View v) {
                 super(v);
@@ -192,9 +201,9 @@ public class MainActivity extends BaseActivity {
                 vContributionContent = (TextView) v.findViewById(R.id.txtContributionContent);
                 unexpandedLayout = (RelativeLayout) v.findViewById(R.id.unexpandedLayout);
                 expandedLayout = (RelativeLayout) v.findViewById(R.id.expandedLayout);
+                btnLink = (ImageButton) v.findViewById(R.id.btnLink);
                 btnComments = (ImageButton) v.findViewById(R.id.btnComments);
                 btnSave = (ImageButton) v.findViewById(R.id.btnSave);
-                btnLink = (ImageButton) v.findViewById(R.id.btnLink);
             }
         }
 
@@ -210,9 +219,10 @@ public class MainActivity extends BaseActivity {
         }
 
         @Override
-        public void onBindViewHolder(ContributionViewHolder holder, final int position) {
+        public void onBindViewHolder(final ContributionViewHolder holder, final int position) {
             final Contribution contribution = savedList.get(position);
             final boolean isExpanded = position == expandedPosition;
+
             holder.expandedLayout.setVisibility(isExpanded ? View.VISIBLE:View.GONE);
 
             holder.unexpandedLayout.setOnClickListener(new View.OnClickListener() {
@@ -227,17 +237,97 @@ public class MainActivity extends BaseActivity {
                 }
             });
 
-            //open url
-//            @Override public void onClick(View v) {
-//                Uri address;
-//                if (contribution instanceof Submission) {
-//                    address = Uri.parse(((Submission) contribution).getUrl());
-//                } else {
-//                    address = Uri.parse(((Comment) contribution).getUrl());
-//                }
-//                Intent intent = new Intent(Intent.ACTION_VIEW, address);
-//                startActivity(intent);
-//            }
+            holder.btnLink.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Uri address;
+                    if (contribution instanceof Submission) {
+                        address = Uri.parse(((Submission) contribution).getUrl());
+                    } else {
+                        address = Uri.parse(((Comment) contribution).getUrl() + contribution.getId());
+                    }
+                    Intent intent = new Intent(Intent.ACTION_VIEW, address);
+                    startActivity(intent);
+                }
+            });
+
+            holder.btnComments.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Uri address;
+                    if (contribution instanceof Submission) {
+                        address = Uri.parse("https://www.reddit.com" + ((Submission) contribution).getPermalink());
+                    } else {
+                        address = Uri.parse(((Comment) contribution).getUrl());
+                    }
+                    Intent intent = new Intent(Intent.ACTION_VIEW, address);
+                    startActivity(intent);
+                }
+            });
+
+            holder.btnSave.setOnClickListener(new View.OnClickListener() {
+                boolean isSaved = true;
+                @Override
+                public void onClick(View v) {
+                    new AsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            try {
+                                if (isSaved) {
+                                    if (contribution instanceof Submission) {
+                                        manager.unsave((Submission) contribution);
+                                    } else {
+                                        manager.unsave((Comment) contribution);
+                                    }
+                                    isSaved = false;
+                                } else {
+                                    if (contribution instanceof Submission) {
+                                        manager.save((Submission) contribution);
+                                    } else {
+                                        manager.save((Comment) contribution);
+                                    }
+                                    isSaved = true;
+                                }
+
+//                                if (contribution instanceof Submission) {
+//                                    if (((Submission) contribution).isSaved()) {
+//                                        manager.unsave((Submission) contribution);
+//                                        unsaved = true;
+//                                    } else {
+//                                        manager.save((Submission) contribution);
+//                                        unsaved = false;
+//                                    }
+//                                } else {
+//                                    if (((Comment) contribution).isSaved()) {
+//                                        manager.unsave((Comment) contribution);
+//                                        unsaved = true;
+//                                    } else {
+//                                        manager.save((Comment) contribution);
+//                                        unsaved = false;
+//                                    }
+//                                }
+                            } catch (NetworkException | ApiException e) {
+                                Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Void aVoid) {
+                            if (!isSaved) {
+                                holder.btnSave.setImageResource(R.drawable.ic_star_border_black_24dp);
+                                Toast.makeText(MainActivity.this, "Unsaved", Toast.LENGTH_SHORT).show();
+                            } else {
+                                holder.btnSave.setImageResource(R.drawable.ic_star_black_24dp);
+                                Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                    }.execute();
+
+                }
+            });
+
             holder.vContributionNum.setText(String.format("#%d", position + 1));
             if (contribution instanceof Submission){
                 holder.vContributionContent.setText(((Submission)contribution).getTitle());
