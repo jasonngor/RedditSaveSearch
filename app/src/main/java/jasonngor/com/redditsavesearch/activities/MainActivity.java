@@ -8,7 +8,6 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -289,23 +288,6 @@ public class MainActivity extends BaseActivity {
                                     isSaved = true;
                                 }
 
-//                                if (contribution instanceof Submission) {
-//                                    if (((Submission) contribution).isSaved()) {
-//                                        manager.unsave((Submission) contribution);
-//                                        unsaved = true;
-//                                    } else {
-//                                        manager.save((Submission) contribution);
-//                                        unsaved = false;
-//                                    }
-//                                } else {
-//                                    if (((Comment) contribution).isSaved()) {
-//                                        manager.unsave((Comment) contribution);
-//                                        unsaved = true;
-//                                    } else {
-//                                        manager.save((Comment) contribution);
-//                                        unsaved = false;
-//                                    }
-//                                }
                             } catch (NetworkException | ApiException e) {
                                 Toast.makeText(MainActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
                             }
