@@ -8,6 +8,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -112,6 +113,7 @@ public class MainActivity extends BaseActivity {
 
         final MenuItem searchItem = menu.findItem(R.id.search_toolbar_item);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setMaxWidth(Integer.MAX_VALUE);
 
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
@@ -124,6 +126,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public boolean onClose() {
                 setItemsVisibility(menu, searchItem, true);
+                MainActivity.this.invalidateOptionsMenu();
                 return false;
             }
         });
@@ -145,9 +148,10 @@ public class MainActivity extends BaseActivity {
     }
 
     private void setItemsVisibility(Menu menu, MenuItem exception, boolean visible) {
-        for (int i = 0; i < menu.size(); ++i) {
+        for (int i = 0; i < menu.size(); i++) {
             MenuItem item = menu.getItem(i);
             if (item != exception) item.setVisible(visible);
+            Log.d("itemsetvisible", item.toString() + String.valueOf(item.isVisible()));
         }
     }
 
