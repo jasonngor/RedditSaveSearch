@@ -192,6 +192,8 @@ public class MainActivity extends BaseActivity {
         public class ContributionViewHolder extends RecyclerView.ViewHolder {
             private TextView vContributionContent;
             private TextView vContributionNum;
+            private TextView vContributionType;
+            private TextView vAdditionalInfo;
             private RelativeLayout unexpandedLayout;
             private RelativeLayout expandedLayout;
             private ImageButton btnLink;
@@ -202,11 +204,13 @@ public class MainActivity extends BaseActivity {
                 super(v);
                 vContributionNum = (TextView) v.findViewById(R.id.txtContributionNum);
                 vContributionContent = (TextView) v.findViewById(R.id.txtContributionContent);
+                vContributionType = (TextView) v.findViewById(R.id.txtContributionType);
+                vAdditionalInfo = (TextView) v.findViewById(R.id.txtAdditionalInfo);
+                btnSave = (ImageButton) v.findViewById(R.id.btnSave);
                 unexpandedLayout = (RelativeLayout) v.findViewById(R.id.unexpandedLayout);
                 expandedLayout = (RelativeLayout) v.findViewById(R.id.expandedLayout);
                 btnLink = (ImageButton) v.findViewById(R.id.btnLink);
                 btnComments = (ImageButton) v.findViewById(R.id.btnComments);
-                btnSave = (ImageButton) v.findViewById(R.id.btnSave);
             }
         }
 
@@ -227,6 +231,7 @@ public class MainActivity extends BaseActivity {
             final boolean isExpanded = position == expandedPosition;
 
             holder.expandedLayout.setVisibility(isExpanded ? View.VISIBLE:View.GONE);
+            holder.vAdditionalInfo.setVisibility(isExpanded ? View.VISIBLE:View.GONE);
 
             holder.unexpandedLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -317,9 +322,19 @@ public class MainActivity extends BaseActivity {
             holder.vContributionNum.setText(String.format("#%d", position + 1));
             if (contribution instanceof Submission){
                 holder.vContributionContent.setText(((Submission)contribution).getTitle());
+                if (((Submission) contribution).isSelfPost()) {
+                    holder.vContributionType.setText("Self Post");
+                    holder.vAdditionalInfo.setText(((Submission) contribution).getSelftext());
+                } else {
+                    holder.vContributionType.setText("Submission");
+                    holder.vAdditionalInfo.setText(((Submission) contribution).getUrl());
+                }
             } else if (contribution instanceof Comment) {
                 holder.vContributionContent.setText(((Comment)contribution).getSubmissionTitle());
+                holder.vContributionType.setText("Comment");
+                holder.vAdditionalInfo.setText(((Comment) contribution).getBody());
             }
+
         }
 
         @Override
@@ -333,13 +348,16 @@ public class MainActivity extends BaseActivity {
                 savedList.addAll(savedListCopy);
             } else {
                 text = text.toLowerCase();
-                for (Contribution c: savedListCopy) {
+                for (Contribution c : savedListCopy) {
                     if (c instanceof Submission) {
-                        if (((Submission) c).getTitle().toLowerCase().contains(text)) {
+                        if (((Submission) c).getTitle().toLowerCase().contains(text) ||
+                                (((Submission) c).getUrl().contains(text)) ||
+                                (((Submission) c).getSelftext().contains(text))) {
                             savedList.add(c);
                         }
                     } else {
-                        if (((Comment) c).getSubmissionTitle().toLowerCase().contains(text)) {
+                        if (((Comment) c).getSubmissionTitle().toLowerCase().contains(text) ||
+                                ((Comment) c).getBody().contains(text)) {
                             savedList.add(c);
                         }
                     }
@@ -348,9 +366,9 @@ public class MainActivity extends BaseActivity {
             notifyDataSetChanged();
         }
 
-        public void clear() {
-            savedList.clear();
-            notifyDataSetChanged();
-        }
+    public void clear() {
+        savedList.clear();
+        notifyDataSetChanged();
     }
+}
 }
