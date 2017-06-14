@@ -58,17 +58,17 @@ public class MainActivity extends BaseActivity {
             reddit = AuthenticationManager.get().getRedditClient();
             loggedUser = reddit.getAuthenticatedUser();
             manager = new AccountManager(reddit);
-        } catch (IllegalStateException e) {
+
+            recyclerView = (FastScrollRecyclerView) findViewById(R.id.recyclerView);
+            recyclerView.setHasFixedSize(true);
+            layoutManager = new LinearLayoutManager(this);
+            recyclerView.setLayoutManager(layoutManager);
+
+            getAllSavedAsyncTask();
+        } catch (IllegalStateException | NetworkException e) {
             MainActivity.this.finish();
         }
 
-
-        recyclerView = (FastScrollRecyclerView) findViewById(R.id.recyclerView);
-        recyclerView.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
-        getAllSavedAsyncTask();
     }
 
     public void getAllSavedAsyncTask() {
