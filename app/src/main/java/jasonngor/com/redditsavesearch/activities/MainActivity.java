@@ -33,6 +33,9 @@ import net.dean.jraw.models.Submission;
 import net.dean.jraw.paginators.UserContributionPaginator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Random;
 
 import jasonngor.com.redditsavesearch.R;
 
@@ -68,7 +71,6 @@ public class MainActivity extends BaseActivity {
         } catch (IllegalStateException | NetworkException e) {
             MainActivity.this.finish();
         }
-
     }
 
     public void getAllSavedAsyncTask() {
@@ -179,6 +181,10 @@ public class MainActivity extends BaseActivity {
                 getAllSavedAsyncTask();
                 return true;
 
+            case R.id.random_toolbar_item:
+                adapter.random();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -188,6 +194,7 @@ public class MainActivity extends BaseActivity {
         private ArrayList<Contribution> savedList;
         private ArrayList<Contribution> savedListCopy;
         private int expandedPosition = -1;
+        private boolean random = false;
 
         public class ContributionViewHolder extends RecyclerView.ViewHolder {
             private TextView vContributionContent;
@@ -366,9 +373,31 @@ public class MainActivity extends BaseActivity {
             notifyDataSetChanged();
         }
 
-    public void clear() {
-        savedList.clear();
-        notifyDataSetChanged();
+        public void clear() {
+            savedList.clear();
+            notifyDataSetChanged();
+        }
+
+        public void random() {
+            if (!random) {
+                Random rand = new Random();
+                savedList.clear();
+                HashSet<Integer> added = new HashSet<>();
+                while (added.size() < 10) {
+                    added.add(rand.nextInt(savedListCopy.size()));
+                }
+                Iterator<Integer> addedIter = added.iterator();
+                while (addedIter.hasNext()) {
+                    savedList.add(savedListCopy.get(addedIter.next()));
+                }
+                random = true;
+                notifyDataSetChanged();
+            } else {
+                savedList.clear();
+                savedList.addAll(savedListCopy);
+                random = false;
+                notifyDataSetChanged();
+            }
+        }
     }
-}
 }

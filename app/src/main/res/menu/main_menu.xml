@@ -22,4 +22,11 @@
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_search_black_24dp"
         app:actionViewClass="android.support.v7.widget.SearchView" />
+
+    <item
+        android:id="@+id/random_toolbar_item"
+        android:orderInCategory="300"
+        android:title="Random 10"
+        app:showAsAction="ifRoom" />
+
 </menu>
