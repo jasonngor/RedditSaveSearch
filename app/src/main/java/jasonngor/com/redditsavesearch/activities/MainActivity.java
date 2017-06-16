@@ -259,8 +259,16 @@ public class MainActivity extends BaseActivity {
                     if (contribution instanceof Submission) {
                         address = Uri.parse(((Submission) contribution).getUrl());
                     } else {
-                        address = Uri.parse(((Comment) contribution).getUrl() + contribution.getId());
+                        address = Uri.parse("https://www.reddit.com/r/" +
+                                ((Comment) contribution).getSubredditName() +
+                                "/comments/" +
+                                ((Comment) contribution).getSubmissionId().substring(3) +
+                                "/" + ((Comment) contribution).getSubmissionTitle()
+                                .replace(" ", "_")
+                                .replaceAll("\\W", "") +
+                                "/" + contribution.getId());
                     }
+                    Log.d("clickaddress", address.toString());
                     Intent intent = new Intent(Intent.ACTION_VIEW, address);
                     startActivity(intent);
                 }
@@ -273,7 +281,10 @@ public class MainActivity extends BaseActivity {
                     if (contribution instanceof Submission) {
                         address = Uri.parse("https://www.reddit.com" + ((Submission) contribution).getPermalink());
                     } else {
-                        address = Uri.parse(((Comment) contribution).getUrl());
+                        address = Uri.parse("https://www.reddit.com/r/" +
+                                ((Comment) contribution).getSubredditName() +
+                                "/comments/" +
+                                ((Comment) contribution).getSubmissionId().substring(3));
                     }
                     Intent intent = new Intent(Intent.ACTION_VIEW, address);
                     startActivity(intent);
