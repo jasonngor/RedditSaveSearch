@@ -114,13 +114,14 @@ public class MainActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.main_menu, menu);
 
         final MenuItem searchItem = menu.findItem(R.id.search_toolbar_item);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         searchView.setMaxWidth(Integer.MAX_VALUE);
 
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setItemsVisibility(menu, searchItem, false);
+                searchView.requestFocus();
             }
         });
 
