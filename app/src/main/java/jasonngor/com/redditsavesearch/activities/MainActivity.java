@@ -49,6 +49,7 @@ public class MainActivity extends BaseActivity {
     private String loggedUser;
     private ArrayList<Contribution> savedList;
     private AccountManager manager;
+    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +87,7 @@ public class MainActivity extends BaseActivity {
                     adapter.clear();
                 }
                 spinner.setVisibility(View.VISIBLE);
+                setItemsVisibility(menu, null, false);
             }
 
             @Override
@@ -105,12 +107,15 @@ public class MainActivity extends BaseActivity {
             protected void onPostExecute(ArrayList<Contribution> savedList) {
                 spinner.setVisibility(View.GONE);
                 recyclerView.setAdapter(adapter);
+                setItemsVisibility(menu, null, true);
             }
         }.execute(paginator);
     }
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
+        this.menu = menu;
+
         getMenuInflater().inflate(R.menu.main_menu, menu);
 
         final MenuItem searchItem = menu.findItem(R.id.search_toolbar_item);
@@ -147,14 +152,18 @@ public class MainActivity extends BaseActivity {
                 return true;
             }
         });
+
+        setItemsVisibility(menu, null, false);
         return true;
     }
 
     private void setItemsVisibility(Menu menu, MenuItem exception, boolean visible) {
-        for (int i = 0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            if (item != exception) item.setVisible(visible);
-            Log.d("itemsetvisible", item.toString() + String.valueOf(item.isVisible()));
+        if (menu != null) {
+            for (int i = 0; i < menu.size(); i++) {
+                MenuItem item = menu.getItem(i);
+                if (item != exception) item.setVisible(visible);
+                Log.d("itemsetvisible", item.toString() + String.valueOf(item.isVisible()));
+            }
         }
     }
 
@@ -179,6 +188,7 @@ public class MainActivity extends BaseActivity {
                 return true;
 
             case R.id.refresh_toolbar_item:
+                setItemsVisibility(menu, null, false);
                 getAllSavedAsyncTask();
                 return true;
 
