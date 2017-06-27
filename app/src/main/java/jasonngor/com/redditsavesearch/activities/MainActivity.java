@@ -153,7 +153,6 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        setItemsVisibility(menu, null, false);
         return true;
     }
 
