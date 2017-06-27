@@ -50,6 +50,7 @@ public class MainActivity extends BaseActivity {
     private ArrayList<Contribution> savedList;
     private AccountManager manager;
     private Menu menu;
+    private boolean ready = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +109,7 @@ public class MainActivity extends BaseActivity {
                 spinner.setVisibility(View.GONE);
                 recyclerView.setAdapter(adapter);
                 setItemsVisibility(menu, null, true);
+                ready = true;
             }
         }.execute(paginator);
     }
@@ -153,6 +155,15 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if (ready) {
+            setItemsVisibility(menu, null, true);
+        }
         return true;
     }
 
